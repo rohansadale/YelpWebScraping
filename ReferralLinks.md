@@ -1,3 +1,7 @@
+#Yelp Locations
+http://www.yelp.com/locations
+
+
 #Yelp's Academic Dataset
 https://www.yelp.com/academic_dataset
 
