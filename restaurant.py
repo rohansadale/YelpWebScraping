@@ -78,17 +78,23 @@ def search(location, longitude, latitude):
 	return request(API_HOST, SEARCH_PATH, urlParams)
 	
 
-def writeData(location, restaurantData):
-	with open(location + '.csv', 'a') as f:
-		fieldNames = ['ID', 'NAME', 'REVIEW_COUNT', 'RATING', 'LONGITUDE', 'LATITUDE', 'CITY', 'STATE', 'ZIP', 'COUNTRY']	
-		writer = csv.DictWriter(f, fieldnames=fieldNames, delimiter='|')
-		writer.writerows(restaurantData)
-
+def writeData(location, dataCategory, dataCategoryType):
+	if dataCategoryType == 'restaurants': 
+		with open(location + '_Restaurants.csv', 'a') as f:
+			fieldNames = ['ID', 'NAME', 'REVIEW_COUNT', 'RATING', 'LONGITUDE', 'LATITUDE', 'CITY', 'STATE', 'ZIP', 'COUNTRY', 'CATEGORY']	
+			writer = csv.DictWriter(f, fieldnames=fieldNames, delimiter='|')
+			writer.writerows(dataCategory)
+	elif dataCategoryType == 'categories':
+		with open(location + '_Category.csv', 'a') as f:
+			fieldNames = ['RESTAURANT_ID', 'CATEGORY']
+			writer = csv.DictWriter(f, fieldnames=fieldNames, delimiter='|')
+			writer.writerows(dataCategory)
+	
 def getallNeighbourhoodData():
 	neighbourhood = {}
 	with open('Cities.txt', 'r') as f:
         	areas = f.readlines()
-	
+
 	for area in areas:
 	        area = area.strip('\n').split('|')
 	        if area[0] not in neighbourhood.keys():
@@ -132,13 +138,18 @@ def queryApi(city, neighbourhood = ''):
 				tempRestaurantData['ZIP']		= restaurant['location']['postal_code'] if restaurant['location'].get('postal_code') else 99999
 				tempRestaurantData['COUNTRY']		= restaurant['location']['country_code']
 				
+				tempRestaurantData['CATEGORY']		= ''	
 				if restaurant.get('categories'):
 					for category in restaurant['categories']:
-						tempCategoryData['RESTAURANT_ID']	= restaurant['id'] 
-						tempCategoryData['CATEGORY']	= category[1]
-						categoryData.append(tempCategoryData)
-						tempCategoryData = {}
-	
+#						tempCategoryData['RESTAURANT_ID']	= restaurant['id'].encode('ascii', 'ignore') 
+#						tempCategoryData['CATEGORY']	= category[1].encode('ascii', 'ignore')
+#						categoryData.append(tempCategoryData)
+#						tempCategoryData = {}
+						categoryData.append(category[1].encode('ascii', 'ignore'))					
+					
+					tempRestaurantData['CATEGORY'] = ",".join(categoryData)
+					categoryData = []
+
 			 	restaurantData.append(tempRestaurantData)
 				tempRestaurantData = {}
 	
@@ -146,7 +157,7 @@ def queryApi(city, neighbourhood = ''):
 			OFFSET_LIMIT += 20
 		
 	print 'Writing {0} records'.format(OFFSET_LIMIT)
-	writeData(city, restaurantData)
+	writeData(city, restaurantData, 'restaurants')
 	OFFSET_LIMIT = 0
 
 def main():
@@ -156,7 +167,7 @@ def main():
 
 	allCities = getallNeighbourhoodData()
 	for city, neighbourhoods in allCities.items():
-		for neighbourhood in neighbourhoods:
+		for neighbourhood in neighbourhoods:			
 		        try:
 				queryApi(city, neighbourhood)
 			except urllib2.HTTPError as error:
@@ -164,13 +175,5 @@ def main():
 		queryApi(city)
 
 		
-'''	
-	try:
-		queryApi(inputValues.location)
-	except urllib2.HTTPError as error:
-#		pprint(error.reason, indent = 2)
-		sys.exit('Encountered HTTP error {0}. Abort Program.'.format(error.code))		
-'''		
-
 if __name__ == '__main__':
 	main()
