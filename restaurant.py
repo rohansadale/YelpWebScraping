@@ -1,3 +1,17 @@
+'''
+# Add YelpAPI key in config.py file
+# Add Neighbourhood names in Cities.txt file. 
+	Sample :  
+		CityName1|Neighbourhood1
+		CityName1|Neighbourhood2
+		CityName2|Neighbourhood1
+		...
+		...
+# Output file formed as CityName1.csv, CityName2.csv, ...
+# Usage:  python  restaurant.py
+'''
+
+
 import argparse
 from pprint import pprint
 import json
