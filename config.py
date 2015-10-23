@@ -1,4 +1,0 @@
-consumerKey	= ""
-consumerSecret	= ""
-token		= ""
-tokenSecret	= ""
