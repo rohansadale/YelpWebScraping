@@ -2,22 +2,22 @@ import yelp
 import sys
 from bs4 import BeautifulSoup
 import requests
+import config
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
 
-CONSUMER_KEY = 'fjsrpoOFALWvCQydOw6FyA'
-CONSUMER_SECRET = 'oUrEbZtfjGBk5travjL47n4Gcd4'
-TOKEN = 'COLiP9mPx2mzYxlgeWo4UNz420tcAwah'
-TOKEN_SECRET = 'noStqU0FQ8Glzg0V7VEW2GDpatw'
+yelp_api = yelp.Api(consumer_key=config.CONSUMER_KEY,
+                    consumer_secret=config.CONSUMER_SECRET,
+                    access_token_key=config.TOKEN,
+                    access_token_secret=config.TOKEN_SECRET)
 
-yelp_api = yelp.Api(consumer_key=CONSUMER_KEY,
-                    consumer_secret=CONSUMER_SECRET,
-                    access_token_key=TOKEN,
-                    access_token_secret=TOKEN_SECRET)
+location_city = "Minneapolis"
+category = 'chinese'
+term = "restaurant"
 
-top20Chinese = yelp_api.Search(term="restaurant", location="Minneapolis", sort = 2, limit = 20, category_filter = 'chinese')
+top20Chinese = yelp_api.Search(term=term, location=location_city, sort = 2, limit = 20, category_filter = category)
 
 top20Restaurants = dict()
 for restaurant in top20Chinese.businesses:
