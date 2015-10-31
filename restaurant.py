@@ -1,14 +1,27 @@
 '''
 # Add YelpAPI key in config.py file
-# Add Neighbourhood names in Cities.txt file. 
+# Input file format 
 	Sample :  
 		CityName1|Neighbourhood1
 		CityName1|Neighbourhood2
 		CityName2|Neighbourhood1
 		...
 		...
-# Output file formed as CityName1.csv, CityName2.csv, ...
-# Usage:  python  restaurant.py
+# usage: restaurant.py [-h] -f FILENAME -s SEARCHTERM
+
+	Scrape Data through Yelp API
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -f FILENAME, --fileName FILENAME
+	                        Name of file containing neighbourhoods and their
+	                        respective cities in a pipe-delimited fashion
+	  -s SEARCHTERM, --searchTerm SEARCHTERM
+	                        Search Category for the data. eg. restaurants, bars,
+	                        chinese, etc.
+
+# Output file: formed in 'output' folder
+
 '''
 
 
@@ -24,21 +37,25 @@ import csv
 import time
 import getlocation
 
-#Global Variables Declaration
+# Global Variables Declaration
 API_HOST	= "api.yelp.com"
 SEARCH_PATH	= "/v2/search"
 BUSINESS_PATH	= "/v2/business/"
 SEARCH_LIMIT 	= 20
 OFFSET_LIMIT	= 0
 SORT_TYPE	= 2
-MAX_LIMIT	= 100
+MAX_LIMIT	= 40
+TERM		= 'restaurants'
+INPUT_FILE_NAME	= ''
 
+# Yelp API Keys from config file
 CONSUMER_KEY	= config.consumerKey
 CONSUMER_SECRET	= config.consumerSecret
 TOKEN		= config.token
 TOKEN_SECRET	= config.tokenSecret 
 
 
+# Request and response from Yelp API
 def request(host, path, urlParams=None):
 	urlParams = urlParams or {}
 	url = 'https://{0}{1}'.format(host, path)
@@ -65,12 +82,13 @@ def request(host, path, urlParams=None):
 	return response	
 
 
+# Declare search parameters to be passed to API
 def search(location, longitude, latitude):
 
 	urlParams = {
 			'location'	: location,
 			'cll'		: str(latitude) + ', ' + str(longitude),
-			'term'		: 'restaurants',
+			'term'		: TERM,
 			'limit'		: SEARCH_LIMIT,
 			'offset'	: OFFSET_LIMIT,
 			'sort'		: SORT_TYPE
@@ -78,21 +96,18 @@ def search(location, longitude, latitude):
 	return request(API_HOST, SEARCH_PATH, urlParams)
 	
 
-def writeData(location, dataCategory, dataCategoryType):
-	if dataCategoryType == 'restaurants': 
-		with open(location + '_Restaurants.csv', 'a') as f:
-			fieldNames = ['ID', 'NAME', 'REVIEW_COUNT', 'RATING', 'LONGITUDE', 'LATITUDE', 'CITY', 'STATE', 'ZIP', 'COUNTRY', 'CATEGORY']	
-			writer = csv.DictWriter(f, fieldnames=fieldNames, delimiter='|')
-			writer.writerows(dataCategory)
-	elif dataCategoryType == 'categories':
-		with open(location + '_Category.csv', 'a') as f:
-			fieldNames = ['RESTAURANT_ID', 'CATEGORY']
-			writer = csv.DictWriter(f, fieldnames=fieldNames, delimiter='|')
-			writer.writerows(dataCategory)
+# Write Data to output file.
+def writeData(location, dataCategory):
+	with open('output/' + TERM + '.csv', 'a') as f:
+		fieldNames = ['ID', 'NAME', 'REVIEW_COUNT', 'RATING', 'LONGITUDE', 'LATITUDE', 'CITY', 'STATE', 'ZIP', 'COUNTRY', 'CATEGORY']	
+		writer = csv.DictWriter(f, fieldnames=fieldNames, delimiter='|')
+		writer.writerows(dataCategory)
 	
+
+# Read the input file and transform the data -  creates a dictionary with CityName as key and NeighbourhoodNames list as its value
 def getallNeighbourhoodData():
 	neighbourhood = {}
-	with open('Cities.txt', 'r') as f:
+	with open(INPUT_FILE_NAME, 'r') as f:
         	areas = f.readlines()
 
 	for area in areas:
@@ -105,6 +120,7 @@ def getallNeighbourhoodData():
 	return neighbourhood
 
 
+# Scrape Data for each Neighbourhood
 def queryApi(city, neighbourhood = ''):
 	restaurantData = []
 	categoryData = []
@@ -112,10 +128,13 @@ def queryApi(city, neighbourhood = ''):
 	tempCategoryData = {}
 	global OFFSET_LIMIT
 	global MAX_LIMIT
-	location = neighbourhood + ', ' + city
+	location = neighbourhood + ', ' + city + ', US'
+
+	# Get longitude and latitude from Google Geocoding API V3 
         longitude, latitude = getlocation.getCoordinates(location)
 	print location, longitude, latitude
 
+	# Call API twice for each neighbourhood (API response restricted to 20 records for each request) 
 	while OFFSET_LIMIT < MAX_LIMIT:
 		response = search(location, longitude, latitude)
 		MAX_LIMIT = response['total']
@@ -139,12 +158,10 @@ def queryApi(city, neighbourhood = ''):
 				tempRestaurantData['COUNTRY']		= restaurant['location']['country_code']
 				
 				tempRestaurantData['CATEGORY']		= ''	
+
+				# If Categories are present, store them as comma seperated strings
 				if restaurant.get('categories'):
 					for category in restaurant['categories']:
-#						tempCategoryData['RESTAURANT_ID']	= restaurant['id'].encode('ascii', 'ignore') 
-#						tempCategoryData['CATEGORY']	= category[1].encode('ascii', 'ignore')
-#						categoryData.append(tempCategoryData)
-#						tempCategoryData = {}
 						categoryData.append(category[1].encode('ascii', 'ignore'))					
 					
 					tempRestaurantData['CATEGORY'] = ",".join(categoryData)
@@ -155,23 +172,38 @@ def queryApi(city, neighbourhood = ''):
 	
 			time.sleep(4)
 			OFFSET_LIMIT += 20
-		
+	
+	# Write data for each neighbourhood. Maximum of 40 records
 	print 'Writing {0} records'.format(OFFSET_LIMIT)
-	writeData(city, restaurantData, 'restaurants')
+	writeData(city, restaurantData)
 	OFFSET_LIMIT = 0
 
+# Main function
 def main():
-	parser = argparse.ArgumentParser();
-	parser.add_argument('-l', '--location', dest='location', type=str, help='Name of City')
+
+
+	parser = argparse.ArgumentParser(description='Scrape Data through Yelp API');
+	parser.add_argument('-f', '--fileName', dest='fileName', type=str, help='Name of file containing neighbourhoods and their respective cities in a pipe-delimited fashion', required=True)
+	parser.add_argument('-s', '--searchTerm', dest='searchTerm', type=str, help='Search Category for the data. eg. restaurants, bars, chinese, etc. ', required=True)
 	inputValues = parser.parse_args()
 
+	global INPUT_FILE_NAME 
+	global TERM
+	INPUT_FILE_NAME = inputValues.fileName
+	TERM = inputValues.searchTerm
+
 	allCities = getallNeighbourhoodData()
+	
+	# For each neighbourhood in each city, get highest rated restaurants 
 	for city, neighbourhoods in allCities.items():
 		for neighbourhood in neighbourhoods:			
 		        try:
 				queryApi(city, neighbourhood)
 			except urllib2.HTTPError as error:
 		                sys.exit('Encountered HTTP error {0}. Abort Program.'.format(error.code))
+
+		# Once all neighbourhoods data for each city is collected, fetch 40 highest rated restaurants in the city. Some restaurants that don't specify neighbourhoods would be skipped in 
+		# above API request call
 		queryApi(city)
 
 		
