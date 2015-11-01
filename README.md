@@ -2,6 +2,7 @@
 Harvesting Yelp Data using API and Website - www.yelp.com
 
 ## Code Components:
+  * config.py
   * getLocation.py 
   * restaurants.py
   * scrapeDate.py
