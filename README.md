@@ -28,7 +28,8 @@ Harvesting Yelp Data using API and Website - www.yelp.com
 	      optional arguments:
 	      -h, --help            show this help message and exit
 	      -f FILENAME, --fileName FILENAME
-	                             Name of file containing neighbourhoods and their respective cities in pipe-delimited fashion
+	                             File containing neighbourhoods and their respective cities 
+	                             in pipe-delimited fashion
 	      -s SEARCHTERM, --searchTerm SEARCHTERM
 	                             Search Category for the data. eg. restaurants, bars, etc.
     ```
