@@ -7,7 +7,7 @@ Harvesting Yelp Data using API and Website - www.yelp.com
   * scrapeDate.py
   * scrapeReviews.py
 
-## Data Scraping for Popular Restarants
+# Data Scraping for Popular Restarants
 
 1. **Input File format:**
     ```
@@ -45,7 +45,7 @@ Harvesting Yelp Data using API and Website - www.yelp.com
                             input file with restaurantIDs
     ```
 
-## Data Scraping for Reviews 
+# Data Scraping for Reviews 
 
 1. **scrapeReviews.py**
 
@@ -63,3 +63,17 @@ Harvesting Yelp Data using API and Website - www.yelp.com
                         	Category for the reviews. eg. chinese, indian, etc.
   	-t TERM, --term TERM  Search by restaurant, bar, etc
 ```
+
+## Datasets Created:
+
+1. RestaurantData.xlsx 	- The raw dataset generated after running `restaurant.py`
+2. filteredRestaurantData1.xlsx - filtered dataset after removing duplicates and noise data (no location, zipcode,etc)
+3. filteredRestaurantData2.xlsx - filtered dataset after removing cities restaurants with restaurants less than 100
+4. filteredRestaurantData3.xlsx - final dataset for restaurants with review_count > 100 and rating > 4.5
+5. reviewData.xlsx - filtered reviews giving improvements for restaurants. This dataset is generated after text mining code `scrapeReviews.py`
+
+## Visualization Files and Codes:
+1. plotting distribution of rating and review count.R
+2. Tableau_Worbook.rar 
+3. Yelp.R - impute missing vales using mice package
+4. Additionally each workbook in dataset above has a sheet called pivots which has analysis along with figures for that workbook. 
