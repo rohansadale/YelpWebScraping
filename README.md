@@ -1,6 +1,10 @@
 # YelpWebScraping
 Harvesting Yelp Data using API and Website - www.yelp.com
 
+##Yelp Reference Links
+ - Locations - http://www.yelp.com/locations
+ - Neighbourhoods - https://www.yelp.com/developers/documentation/v2/neighborhood_list
+
 ## Code Components:
   * config.py
   * getLocation.py 
@@ -8,9 +12,21 @@ Harvesting Yelp Data using API and Website - www.yelp.com
   * scrapeDate.py
   * scrapeReviews.py
 
+## Initial Configuration
+1. Generate Yelp API key on https://www.yelp.com/developers/manage_api_keys
+2. Add the values of key generated to `config.py`
+3. Install required packages. Run `pip install -r requirement.txt` on terminal.
+4. After successful installation of above package, download the nltk corpus. Open terminal and type `python` and press *Enter*. Do following two steps. A new window will open. Select `all` identifier in window and click on *download*
+```
+> import nltk
+> nltk.download()
+```
+	
+
 # Data Scraping for Popular Restarants
 
-1. **Input File format:**
+1. **Input File format:** Sample input file can be found in input/SampleRestaurantInputFile
+
     ```
   Minneapolis|Downtown
   Minneapolis|University
@@ -83,8 +99,4 @@ Harvesting Yelp Data using API and Website - www.yelp.com
 ## Sample Files:
 1. SampleRestaurantInputFile - used with `restaurant.py`
 2. sampleScrapeDateInputFile - used with `scrapeDate.py` 
-
-##Yelp Reference Links
- - Locations - http://www.yelp.com/locations
- - Neighbourhoods - https://www.yelp.com/developers/documentation/v2/neighborhood_list
 
