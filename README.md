@@ -79,3 +79,8 @@ Harvesting Yelp Data using API and Website - www.yelp.com
 2. Tableau_Worbook.rar 
 3. Yelp.R - impute missing vales using mice package
 4. Additionally each workbook in dataset above has a sheet called pivots which has analysis along with figures for that workbook. 
+
+## Sample Files:
+1. SampleRestaurantInputFile - used with `restaurant.py`
+2. sampleScrapeDateInputFile - used with `scrapeDate.py` 
+
