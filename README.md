@@ -97,6 +97,9 @@ Harvesting Yelp Data using API and Website - www.yelp.com
 4. Additionally each workbook in dataset above has a sheet called pivots which has analysis along with figures for that workbook. 
 
 ## Sample Files:
+
+These files can be found in `input` folder. Place the files in same location as corresponding scripts.
+
 1. SampleRestaurantInputFile - used with `restaurant.py`
 2. sampleScrapeDateInputFile - used with `scrapeDate.py` 
 
