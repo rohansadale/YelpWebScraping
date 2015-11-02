@@ -1,0 +1,6 @@
+oauth2
+httplib2==0.9
+pprintpp
+requests
+beautifulsoup4
+nltk
