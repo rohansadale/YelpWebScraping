@@ -84,3 +84,7 @@ Harvesting Yelp Data using API and Website - www.yelp.com
 1. SampleRestaurantInputFile - used with `restaurant.py`
 2. sampleScrapeDateInputFile - used with `scrapeDate.py` 
 
+##Yelp Reference Links
+ - Locations - http://www.yelp.com/locations
+ - Neighbourhoods - https://www.yelp.com/developers/documentation/v2/neighborhood_list
+
